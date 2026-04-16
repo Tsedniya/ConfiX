@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, FormEvent } from "react";
+import {signIn} from '@/lib/auth/auth-client';
 import { useRouter } from "next/navigation";
 
 export default function SignIn() {
@@ -79,7 +80,7 @@ export default function SignIn() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="JULIBEN@gmail.com"
+                placeholder="Name@gmail.com"
                 required
               />
             </div>
