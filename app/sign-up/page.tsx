@@ -14,15 +14,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-
-
-type Role = "attendee" | "speaker" | "organizer";
+import { signUp } from "@/lib/auth/auth-client";
 
 export default function SignUp() {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [role, setRole] = useState<Role>("attendee"); 
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -38,12 +35,11 @@ export default function SignUp() {
       name,
       email,
       password,
-      role,
      });
      if (result.error){
       setError(result.error.message ?? "Faild to sign up")
      }else{
-      router.push("/dashboard");
+      router.push("/choose-role");
      }
 
     }catch(err){
@@ -78,7 +74,7 @@ export default function SignUp() {
               <Input
                 id="name"
                 type="text"
-                placeholder="JULI BEN"
+                placeholder="Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -93,7 +89,7 @@ export default function SignUp() {
               <Input
                 id="email"
                 type="email"
-                placeholder="JULIBEN@gmail.com"
+                placeholder="Name@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -114,23 +110,6 @@ export default function SignUp() {
                 required
                 minLength={8}
               />
-            </div>
-
-            {/* ✅ Role Select */}
-            <div className="space-y-2">
-              <Label htmlFor="role" className="text-gray-700">
-                Role
-              </Label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value as Role)}
-                className="w-full border rounded-md p-2 text-sm"
-              >
-                <option value="attendee">Attendee</option>
-                <option value="speaker">Speaker</option>
-                <option value="organizer">Organizer</option>
-              </select>
             </div>
 
             {/* Error */}

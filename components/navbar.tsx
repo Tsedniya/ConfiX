@@ -12,8 +12,10 @@ import { Button } from "@/components/ui/button";
           ConfiX
         </Link>
 
-        <div className="flex items-center gap-4">
-          <Link href="/sign-in">
+        
+
+        <div>
+            <Link href="/sign-in">
             <Button variant="ghost" className="text-gray-700 hover:text-black">
               Log In
             </Button>
@@ -22,6 +24,7 @@ import { Button } from "@/components/ui/button";
             <Button className="bg-primary hover:bg-primary/90">Sign Up</Button>
           </Link>
         </div>
+       
       </div>
     </nav>
   );
