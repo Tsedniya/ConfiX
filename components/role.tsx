@@ -61,7 +61,7 @@ export default function ChooseRole() {
           {/* Attendee */}
           <Card
             onClick={() => selectRole("attendee")}
-            className={`cursor-pointer transition hover:shadow-lg ${
+            className={`cursor-pointer transition hover:shadow-lg hover:border border-zinc-950 ${
               isLoading("attendee") ? "opacity-60 scale-[0.98]" : ""
             }`}
           >
@@ -86,7 +86,7 @@ export default function ChooseRole() {
           {/* Speaker */}
           <Card
             onClick={() => selectRole("speaker")}
-            className={`cursor-pointer transition hover:shadow-lg ${
+            className={`cursor-pointer transition hover:border border-zinc-950 hover:shadow-lg ${
               isLoading("speaker") ? "opacity-60 scale-[0.98]" : ""
             }`}
           >
@@ -111,7 +111,7 @@ export default function ChooseRole() {
           {/* Organizer */}
           <Card
             onClick={() => selectRole("organizer")}
-            className={`cursor-pointer transition hover:shadow-lg ${
+            className={`cursor-pointer transition hover:shadow-lg hover:border border-zinc-950 ${
               isLoading("organizer") ? "opacity-60 scale-[0.98]" : ""
             }`}
           >

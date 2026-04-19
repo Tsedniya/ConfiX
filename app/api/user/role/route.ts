@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import User from "@/lib/models/user";
+import connectDB from "@/lib/db";
+import mongoose from "mongoose";
+
 
 export async function POST(req: Request) {
+
+  await connectDB();
   // 👇 ADD IT HERE
   console.log("ALL HEADERS:", req.headers);
 console.log("COOKIE STRING:", req.headers.get("cookie"));
@@ -20,10 +25,10 @@ console.log("COOKIE STRING:", req.headers.get("cookie"));
 
   const { role } = await req.json();
 
-  await User.findOneAndUpdate(
-    { email: session.user.email },
-    { role }
-  );
+  await mongoose.connection.collection("users").updateOne(
+  { _id: new mongoose.Types.ObjectId(session.user.id) },
+  { $set: { role } }
+);
 
   return NextResponse.json({ success: true });
 }

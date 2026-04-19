@@ -1,39 +1,46 @@
 import { betterAuth } from "better-auth";
-import {mongodbAdapter} from "better-auth/adapters/mongodb";
-import {MongoClient} from "mongodb";
+import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { MongoClient } from "mongodb";
 import { headers } from "next/headers";
-import {redirect} from "next/navigation"
-
+import { redirect } from "next/navigation";
 
 const client = new MongoClient(process.env.MONGO!);
 const db = client.db();
 
-
 export const auth = betterAuth({
-  //...
-  database:mongodbAdapter(db, {client},
-   
-  ),  
-  emailAndPassword:{
-    enabled :true,
+  database: mongodbAdapter(db, {
+    client,
+  }),
+
+  emailAndPassword: {
+    enabled: true,
+  },
+
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "attendee",
+        input: false,
+      },
+    },
   },
 });
 
-export async function getSession(){
+export async function getSession() {
   const result = await auth.api.getSession({
-    headers:await headers(),
+    headers: await headers(),
   });
   
   return result;
 }
 
-
-export async function signOut(){
+export async function signOut() {
   const result = await auth.api.signOut({
-    headers:await headers(),
+    headers: await headers(),
   });
   
-  if(result.success){
-    redirect("/sign-in")
+  if (result.success) {
+    redirect("/sign-in");
   }
 }
