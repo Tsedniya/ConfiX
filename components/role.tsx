@@ -49,7 +49,7 @@ export default function ChooseRole() {
 
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold">Choose Your Role</h1>
+          <h1 className="text-4xl font-bold ">Choose Your Role</h1>
           <p className="text-gray-500 mt-2">
             Pick how you want to use the platform
           </p>
@@ -66,7 +66,7 @@ export default function ChooseRole() {
             }`}
           >
             <CardHeader>
-              <CardTitle>Attendee</CardTitle>
+              <CardTitle className="text-primary text-lg font-bold">Attendee</CardTitle>
               <CardDescription>
                 Join conferences and explore sessions
               </CardDescription>
@@ -91,7 +91,7 @@ export default function ChooseRole() {
             }`}
           >
             <CardHeader>
-              <CardTitle>Speaker</CardTitle>
+              <CardTitle className="text-primary text-lg font-bold">Speaker</CardTitle>
               <CardDescription>
                 Share knowledge and present sessions
               </CardDescription>
@@ -116,7 +116,7 @@ export default function ChooseRole() {
             }`}
           >
             <CardHeader>
-              <CardTitle>Organizer</CardTitle>
+              <CardTitle className="text-primary font-bold text-lg">Organizer</CardTitle>
               <CardDescription>
                 Create and manage conferences
               </CardDescription>
