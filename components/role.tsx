@@ -32,7 +32,7 @@ export default function ChooseRole() {
       });
 
       if (res.ok) {
-        router.push("/dashboard-attendee");
+        router.push(`/dashboard/${role}`);
       }
     } catch (err) {
       console.error("Failed to set role", err);
