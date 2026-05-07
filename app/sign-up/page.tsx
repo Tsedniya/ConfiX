@@ -14,10 +14,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { signUp } from "@/lib/auth/auth-client";
+import { Select } from "radix-ui";
 
 export default function SignUp() {
   const [name, setName] = useState<string>("");
+  const [role, setRole] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -30,29 +31,11 @@ export default function SignUp() {
     setError("")
     setLoading(true)
 
-    try{
-     const result = await signUp.email({
-      name,
-      email,
-      password,
-     });
-     if (result.error){
-      setError(result.error.message ?? "Faild to sign up")
-     }else{
-      router.push("/choose-role");
-     }
-
-    }catch(err){
-      setError("An unexpected error occurred")
-    }finally{
-      setLoading(false);
-    }
-
 
   }
 
   return (
-    <div className="mt-10 flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 bg-white">
+    <div className="mt-16 flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 bg-white">
       <Card className="w-full max-w-md border-gray-200 shadow-lg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-black">
@@ -110,6 +93,27 @@ export default function SignUp() {
                 required
                 minLength={8}
               />
+            </div>
+
+             <div className="space-y-2">
+              <Label htmlFor="password" className="text-gray-700">
+                Role
+              </Label>
+               <select
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  required
+                  className="w-full border rounded-md p-2"
+                >
+                  <option value="" disabled>
+                    Select role
+                  </option>
+                <option value="attendee">Attendee</option>
+                <option value="speaker">Speaker</option>
+                <option value="organizer">Organizer</option>
+              </select>
+
             </div>
 
             {/* Error */}

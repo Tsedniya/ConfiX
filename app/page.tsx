@@ -1,3 +1,7 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 export default function Home() {
   return (
     <div
@@ -8,17 +12,39 @@ export default function Home() {
       <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-transparent z-0"></div>
 
       {/* Content */}
-      <div className="relative z-10  mt-14 pl-24 max-w-xl">
-        <h1 className="text-white text-left mb-6 lg:text-6xl md:text-5xl sm:2xl font-bold leading-tight">
-          Elevate Your Events.<span className="text-primary-fixed"> Simple, Powerful Management.</span>
-        </h1>
-        <p className="text-lg text-white text-left">
+      <div className="relative z-10 mt-14 pl-24 max-w-xl">
+        
+        {/* Heading - from right */}
+        <motion.h1
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-white text-left mb-6 lg:text-6xl md:text-5xl sm:2xl font-bold leading-tight"
+        >
+          Elevate Your Events.
+          <span className="text-primary-fixed">
+            {" "}Simple, Powerful Management.
+          </span>
+        </motion.h1>
+
+        {/* Paragraph - from bottom */}
+        <motion.p
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="text-lg text-white text-left"
+        >
           Join the world's leading organizations using Confero to deliver seamless
           experiences for attendees, speakers, and organizers alike.
-        </p>
+        </motion.p>
 
-        
-        <div className="flex gap-5 mt-5">
+        {/* Buttons - from bottom with delay */}
+        <motion.div
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex gap-5 mt-5"
+        >
           <div className="w-40 py-2 bg-gradient-to-r from-primary-container to-surface-tint text-white rounded font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center">
             Upcoming Event
           </div>
@@ -26,8 +52,8 @@ export default function Home() {
           <div className="w-40 py-2 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded font-semibold text-sm hover:bg-white/20 transition-all flex items-center justify-center">
             Partner with us
           </div>
-        </div>
-        
+        </motion.div>
+
       </div>
     </div>
   );
