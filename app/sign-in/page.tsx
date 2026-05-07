@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, FormEvent } from "react";
-import {signIn} from '@/lib/auth/auth-client';
 import { useRouter } from "next/navigation";
 
 export default function SignIn() {
@@ -29,24 +28,7 @@ export default function SignIn() {
       setError("")
       setLoading(true)
   
-      try{
-       const result = await signIn.email({
-        email,
-        password,
-       });
-       if (result.error){
-        setError(result.error.message ?? "Faild to sign in")
-       }else{
-        router.push("/dashboard");
-       }
-  
-      }catch(err){
-        setError("An unexpected error occurred")
-      }finally{
-        setLoading(false);
-      }
-  
-  
+      
     }
 
   return (

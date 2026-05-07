@@ -33,9 +33,6 @@ export default function Navbar() {
 
           {session?.user ? (
             <>
-              <Link href="/conferences">
-                <Button variant="ghost">Conferences</Button>
-              </Link>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

@@ -6,13 +6,13 @@ import Navbar from "@/components/navbar";
 export default function NavbarWrapper() {
   const pathname = usePathname();
 
-  const hiddenRoutes = ["/choose-role"];
+  const allowedRoutes = ["/", "/sign-in", "/sign-up"];
 
-  const hideNavbar = hiddenRoutes.some((route) =>
-    pathname.startsWith(route)
+  const showNavbar = allowedRoutes.some((route) =>
+    pathname === route
   );
 
-  if (hideNavbar) return null;
+  if (!showNavbar) return null;
 
   return <Navbar />;
 }

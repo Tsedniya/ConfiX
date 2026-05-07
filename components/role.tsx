@@ -13,8 +13,8 @@ import { useState } from "react";
 type Role = "attendee" | "speaker" | "organizer";
 
 export default function ChooseRole() {
-  const router = useRouter();
 
+  const router = useRouter();
   const [loadingRole, setLoadingRole] = useState<Role | null>(null);
 
   const selectRole = async (role: Role) => {
