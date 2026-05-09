@@ -23,13 +23,41 @@ export default function SignIn() {
 
   const router = useRouter();
   
-  async function handleSubmit(e:React.FormEvent){
-      e.preventDefault();
-      setError("")
-      setLoading(true)
-  
-      
+  async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
+
+  try {
+    setError("");
+    setLoading(true);
+
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        
+        email,
+        password
+        
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Something went wrong");
     }
+
+   
+    router.push("/dashboard");
+
+  } catch (err: any) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+}
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 bg-white">

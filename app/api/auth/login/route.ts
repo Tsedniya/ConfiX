@@ -8,15 +8,34 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    const user = await loginUser(body);
+    const { user, token } = await loginUser(body);
 
-    return NextResponse.json(
-      { success: true, user },
+    // create response
+    const response = NextResponse.json(
+      {
+        success: true,
+        user,
+      },
       { status: 200 }
     );
+
+    // 🍪 SEND COOKIE HERE
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return response;
+
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, message: error.message || "Sign in failed" },
+      {
+        success: false,
+        message: error.message || "Login failed",
+      },
       { status: 400 }
     );
   }

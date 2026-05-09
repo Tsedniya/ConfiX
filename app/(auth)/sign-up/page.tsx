@@ -26,13 +26,41 @@ export default function SignUp() {
 
   const router = useRouter();
 
-  async function handleSubmit(e:React.FormEvent){
-    e.preventDefault();
-    setError("")
-    setLoading(true)
+  async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
 
+  try {
+    setError("");
+    setLoading(true);
 
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        role,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Something went wrong");
+    }
+
+    
+    router.push("/sign-in");
+
+  } catch (err: any) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <div className="mt-16 flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 bg-white">

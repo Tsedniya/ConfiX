@@ -10,11 +10,9 @@ type LoginInput = {
 export async function loginUser(data: LoginInput) {
   const { email, password } = data;
 
-
   if (!email || !password) {
     throw new Error("Missing required fields");
   }
-
 
   const user = await User.findOne({ email });
 
@@ -22,14 +20,13 @@ export async function loginUser(data: LoginInput) {
     throw new Error("User not found");
   }
 
- 
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
     throw new Error("Invalid credentials");
   }
 
-   const token = jwt.sign(
+  const token = jwt.sign(
     {
       userId: user._id,
       role: user.role,
@@ -38,11 +35,13 @@ export async function loginUser(data: LoginInput) {
     { expiresIn: "7d" }
   );
 
-
   return {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+    token,
   };
 }
