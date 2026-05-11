@@ -11,15 +11,14 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 import Link from "next/link";
-import { useSession } from "@/lib/auth/auth-client";
-import SignOutButton from "./sign-out-btn";
 
 export default function Navbar() {
-  const { data: session } = useSession();
+  // TEMP MOCK USER
+  const user = null;
 
   return (
     <nav className="fixed top-0 left-0 z-20 h-16 w-full border-b bg-white">
-      <div className="container mx-auto grid grid-cols-2 items-center h-16 px-4">
+      <div className="container mx-auto grid h-16 grid-cols-2 items-center px-4">
 
         {/* LEFT - BRAND */}
         <div className="flex items-center gap-6">
@@ -31,35 +30,29 @@ export default function Navbar() {
         {/* RIGHT - NAV + USER */}
         <div className="flex items-center justify-end gap-4">
 
-          {session?.user ? (
-            <>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="p-0">
+                  <Avatar>
+                    <AvatarFallback className="bg-primary text-white">
+                      {user.name?.[0]?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="p-0">
-                    <Avatar>
-                      <AvatarFallback className="bg-primary text-white">
-                        {session.user.name?.[0]?.toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>
-                    <div>
-                      <p>{session.user.name}</p>
-                      <p className="text-xs text-gray-500">
-                        {session.user.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-
-                  <SignOutButton />
-                 
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>
+                  <div>
+                    <p>{user.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {user.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <>
               <Link href="/sign-in">
