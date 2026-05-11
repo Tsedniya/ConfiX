@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+ ConfiX – Conference Management System
 
-First, run the development server:
+A modern, full-featured **Conference Management Platform** built with Next.js 15, TypeScript, and MongoDB.
+
+---
+
+## ✨ Features
+
+### Core Functionality
+- **Multi-Role System**: Admin, Organizer, Speaker, Attendee
+- **Conference Management**: Create, update, publish, and manage conferences
+- **Speaker Proposal System**: Submit proposals with review workflow
+- **Session Management**: Schedule sessions and assign speakers
+- **Attendee Registration**: Registration with payment integration support
+- **QR Code Attendance**: Unique QR codes for check-in at venue
+- **Notifications**: Email and in-app notifications
+- **Feedback & Ratings**: Post-event feedback system
+- **Analytics Dashboard**: Attendance, ratings, and engagement insights
+
+### Technical Features
+- Role-based access control with middleware
+- JWT Authentication (Access + Refresh Token)
+- Fully responsive design with shadcn/ui
+- Feature-Sliced project architecture
+- Server-side rendering with Next.js App Router
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS
+- **UI Components**: shadcn/ui + Radix UI
+- **Authentication**: Custom JWT + Refresh Tokens
+- **Database**: MongoDB + Mongoose
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+
+---
+
+## 📁 Project Structure
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+ConfiX/
+├── app/                    # Next.js App Router
+│   ├── (auth)/
+│   ├── (dashboard)/
+│   ├── api/
+│   └── layout.tsx
+├── features/               # Feature Sliced Design
+│   ├── auth/
+│   ├── conference/
+│   ├── speaker/
+│   └── attendee/
+├── components/             # Shared UI components
+│   └── ui/                 # shadcn components
+├── lib/                    # Utilities & config
+├── models/                 # MongoDB models
+├── hooks/                  # Custom React hooks
+├── middleware.ts
+└── ...
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Getting Started
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Prerequisites
+- Node.js 18+
+- MongoDB (local or MongoDB Atlas)
+- pnpm or npm
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Clone the repository
+git clone https://github.com/Tsedniya/ConfiX.git
+cd ConfiX
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Install dependencies
+pnpm install
+# or
+npm install
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Setup environment variables
+cp .env.example .env.local
+```
 
-## Deploy on Vercel
+### Environment Variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_very_long_and_secure_secret_key
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Run the project
+
+```bash
+pnpm dev
+# or
+npm run dev
+```
+
+
