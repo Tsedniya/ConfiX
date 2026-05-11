@@ -1,6 +1,7 @@
+// features/auth/services/login.ts
 import bcrypt from "bcryptjs";
 import User from "@/models/User";
-import jwt from "jsonwebtoken";
+import { generateAccessToken, generateRefreshToken } from "@/lib/auth";
 
 type LoginInput = {
   email: string;
@@ -14,7 +15,7 @@ export async function loginUser(data: LoginInput) {
     throw new Error("Missing required fields");
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select("-password");
 
   if (!user) {
     throw new Error("User not found");
@@ -26,22 +27,26 @@ export async function loginUser(data: LoginInput) {
     throw new Error("Invalid credentials");
   }
 
-  const token = jwt.sign(
-    {
-      userId: user._id,
-      role: user.role,
-    },
-    process.env.JWT_SECRET!,
-    { expiresIn: "7d" }
-  );
+  // Prepare payload
+  const payload = {
+    userId: user._id.toString(),
+    role: user.role,
+    email: user.email,
+    name: user.name,
+  };
+
+  // Generate both tokens
+  const accessToken = await generateAccessToken(payload);
+  const refreshToken = await generateRefreshToken(payload);
 
   return {
     user: {
-      id: user._id,
+      id: user._id.toString(),
       name: user.name,
       email: user.email,
       role: user.role,
     },
-    token,
+    accessToken,   // ← New
+    refreshToken,  // ← New
   };
 }

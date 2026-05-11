@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   const [email, setEmail] = useState<string>("");
@@ -21,44 +20,35 @@ export default function SignIn() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const router = useRouter();
-  
+
   async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
+  setError("");
+  setLoading(true);
 
   try {
-    setError("");
-    setLoading(true);
-
     const response = await fetch("/api/auth/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        
-        email,
-        password
-        
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      credentials: "include",   // Important
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Something went wrong");
+      throw new Error(data.message || "Login failed");
     }
 
-   
-    router.push("/dashboard");
+    // Full-page navigation ensures the cookie is sent on the next request
+    window.location.href = "/dashboard";
 
   } catch (err: any) {
-    setError(err.message);
+    setError(err.message || "Something went wrong");
   } finally {
     setLoading(false);
   }
 }
-
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 bg-white">
       <Card className="w-full max-w-md border-gray-200 shadow-lg">
