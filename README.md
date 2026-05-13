@@ -1,9 +1,5 @@
 
 
-A modern, full-featured **Conference Management Platform** built with Next.js 15, TypeScript, and MongoDB.
-
----
-
 ## ✨ Features
 
 ### Core Functionality
