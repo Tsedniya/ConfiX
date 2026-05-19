@@ -1,6 +1,8 @@
 // middleware.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { getSession } from "@/lib/auth/session";
+
+
 
 const PROTECTED_PREFIXES = ["/dashboard"];
 const AUTH_ROUTES = ["/sign-in", "/sign-up"];
@@ -17,7 +19,7 @@ const DEFAULT_REDIRECT = "/dashboard/attendee";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const user = await getCurrentUser(request);
+  const user = await getSession(request);
   const isAuthenticated = !!user;
 
   // 1. Redirect authenticated users away from login/signup pages

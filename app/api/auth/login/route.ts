@@ -1,4 +1,3 @@
-// app/api/auth/login/route.ts
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import { loginUser } from "@/features/auth/services/login";
@@ -9,7 +8,7 @@ export async function POST(req: Request) {
     await connectDB();
     const body = await req.json();
 
-    const { user } = await loginUser(body);
+    const user = await loginUser(body);
 
     const payload = {
       userId: user.id,
@@ -23,10 +22,9 @@ export async function POST(req: Request) {
 
     const response = NextResponse.json({
       success: true,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      user,
     });
 
-    // Access Token
     response.cookies.set("token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -35,7 +33,6 @@ export async function POST(req: Request) {
       maxAge: 15 * 60,
     });
 
-    // Refresh Token
     response.cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -46,6 +43,9 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 401 });
+    return NextResponse.json(
+      { success: false, message: error.message },
+      { status: 401 }
+    );
   }
 }
