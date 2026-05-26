@@ -1,4 +1,3 @@
-// app/api/auth/login/route.ts
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import { loginUser } from "@/features/auth/services/login";
@@ -9,7 +8,15 @@ export async function POST(req: Request) {
     await connectDB();
     const body = await req.json();
 
-    const { user } = await loginUser(body);
+    const user = await loginUser(body);
+
+    // Check if user is approved (important for Speaker & Organizer)
+    if (!user.isApproved) {
+      return NextResponse.json({
+        success: false,
+        message: "Your account is pending approval by admin"
+      }, { status: 403 });
+    }
 
     const payload = {
       userId: user.id,
@@ -23,29 +30,42 @@ export async function POST(req: Request) {
 
     const response = NextResponse.json({
       success: true,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      message: "Login successful",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      }
     });
 
-    // Access Token
+    // Set Access Token (short lived)
     response.cookies.set("token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 15 * 60,
+      maxAge: 15 * 60,           // 15 minutes
     });
 
-    // Refresh Token
+    // Set Refresh Token (long lived)
     response.cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: 7 * 24 * 60 * 60,   // 7 days
     });
 
     return response;
+
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 401 });
+    return NextResponse.json(
+      { 
+        success: false, 
+        message: error.message || "Invalid credentials" 
+      },
+      { status: 401 }
+    );
   }
 }

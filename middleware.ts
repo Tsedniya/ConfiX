@@ -1,9 +1,10 @@
 // middleware.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { getSession } from "@/lib/auth/session";
 
 const PROTECTED_PREFIXES = ["/dashboard"];
-const AUTH_ROUTES = ["/sign-in", "/sign-up"];
+const PUBLIC_ROUTES = ["/sign-in", "/sign-up", "/"];
+const API_ROUTES = ["/api/"];
 
 const ROLE_REDIRECT_MAP: Record<string, string> = {
   admin: "/dashboard/admin",
@@ -16,39 +17,41 @@ const DEFAULT_REDIRECT = "/dashboard/attendee";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  const user = await getCurrentUser(request);
+  const user = await getSession(request);
   const isAuthenticated = !!user;
 
-  // 1. Redirect authenticated users away from login/signup pages
-  if (isAuthenticated && AUTH_ROUTES.some((r) => pathname.startsWith(r))) {
-    const userRole = user!.role || "attendee";
-    const roleDashboard = ROLE_REDIRECT_MAP[userRole] ?? DEFAULT_REDIRECT;
-    return NextResponse.redirect(new URL(roleDashboard, request.url));
+  // Skip middleware for API routes and static files
+  if (API_ROUTES.some((route) => pathname.startsWith(route))) {
+    return NextResponse.next();
   }
 
-  // 2. Protect dashboard routes - redirect to login if no valid access token
-  if (!isAuthenticated && PROTECTED_PREFIXES.some((r) => pathname.startsWith(r))) {
-    const signInUrl = new URL("/sign-in", request.url);
-    signInUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(signInUrl);
+  // 1. Authenticated user trying to access auth pages → redirect to their dashboard
+  if (isAuthenticated && PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(route))) {
+    const redirectPath = ROLE_REDIRECT_MAP[user!.role] ?? DEFAULT_REDIRECT;
+    return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 
-  // 3. Redirect root /dashboard to role-specific dashboard
+  // 2. Unauthenticated user trying to access protected routes → redirect to login
+  if (!isAuthenticated && PROTECTED_PREFIXES.some((route) => pathname.startsWith(route))) {
+    const loginUrl = new URL("/sign-in", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // 3. Redirect root /dashboard to correct role dashboard
   if (isAuthenticated && pathname === "/dashboard") {
-    const userRole = user!.role || "attendee";
-    const roleDashboard = ROLE_REDIRECT_MAP[userRole] ?? DEFAULT_REDIRECT;
-    return NextResponse.redirect(new URL(roleDashboard, request.url));
+    const redirectPath = ROLE_REDIRECT_MAP[user!.role] ?? DEFAULT_REDIRECT;
+    return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 
-  // 4. Prevent users from accessing other roles' dashboards
+  // 4. Prevent accessing other roles' dashboards
   if (isAuthenticated && pathname.startsWith("/dashboard/")) {
-    const userRole = user!.role || "attendee";
-    const roleDashboard = ROLE_REDIRECT_MAP[userRole] ?? DEFAULT_REDIRECT;
+    const userRole = user!.role;
     const requestedRole = pathname.split("/")[2];
 
     if (requestedRole && requestedRole !== userRole) {
-      return NextResponse.redirect(new URL(roleDashboard, request.url));
+      const redirectPath = ROLE_REDIRECT_MAP[userRole] ?? DEFAULT_REDIRECT;
+      return NextResponse.redirect(new URL(redirectPath, request.url));
     }
   }
 
@@ -56,5 +59,13 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|public).*)"],
+  matcher: [
+    /*
+     * Match all request paths except for:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, public files, etc.
+     */
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

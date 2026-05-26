@@ -11,13 +11,20 @@ export async function POST(req: Request) {
     const user = await registerUser(body);
 
     return NextResponse.json(
-      { success: true, user },
+      { 
+        success: true, 
+        message: "User registered successfully",
+        user 
+      },
       { status: 201 }
     );
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, message: error.message || "Registration failed" },
-      { status: 400 }
+      { 
+        success: false, 
+        message: error.message || "Registration failed" 
+      },
+      { status: error.status || 400 }
     );
   }
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authorizeRoles } from "@/lib/auth-middleware/roleMiddleware";
+import { authorizeRoles } from "@/lib/auth-middleware/authorize";
 
 const withAdmin = authorizeRoles(["admin"]);
 

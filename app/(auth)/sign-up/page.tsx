@@ -139,7 +139,6 @@ export default function SignUp() {
                   </option>
                 <option value="attendee">Attendee</option>
                 <option value="speaker">Speaker</option>
-                <option value="organizer">Organizer</option>
               </select>
 
             </div>
