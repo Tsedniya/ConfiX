@@ -1,6 +1,6 @@
 import { jwtVerify, SignJWT } from "jose";
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export type UserPayload = {
   userId: string;
@@ -10,7 +10,7 @@ export type UserPayload = {
 };
 
 // ======================
-// ACCESS TOKEN (short-lived)
+// ACCESS TOKEN (15 minutes)
 // ======================
 export async function generateAccessToken(payload: UserPayload) {
   return await new SignJWT(payload)
@@ -21,7 +21,7 @@ export async function generateAccessToken(payload: UserPayload) {
 }
 
 // ======================
-// REFRESH TOKEN (long-lived)
+// REFRESH TOKEN (7 days)
 // ======================
 export async function generateRefreshToken(payload: UserPayload) {
   return await new SignJWT(payload)
@@ -32,9 +32,9 @@ export async function generateRefreshToken(payload: UserPayload) {
 }
 
 // ======================
-// VERIFY TOKEN (pure JWT logic)
+// VERIFY ACCESS TOKEN
 // ======================
-export async function verifyToken(token: string): Promise<UserPayload> {
+export async function verifyAccessToken(token: string): Promise<UserPayload> {
   try {
     const { payload } = await jwtVerify(token, secret);
 
@@ -44,7 +44,24 @@ export async function verifyToken(token: string): Promise<UserPayload> {
       email: payload.email as string,
       name: payload.name as string,
     };
-  } catch {
+  } catch (error) {
     throw new Error("Invalid or expired token");
+  }
+}
+
+// ======================
+// VERIFY REFRESH TOKEN (if needed later)
+// ======================
+export async function verifyRefreshToken(token: string): Promise<UserPayload> {
+  try {
+    const { payload } = await jwtVerify(token, secret);
+    return {
+      userId: payload.userId as string,
+      role: payload.role as string,
+      email: payload.email as string,
+      name: payload.name as string,
+    };
+  } catch {
+    throw new Error("Invalid or expired refresh token");
   }
 }

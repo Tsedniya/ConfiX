@@ -1,6 +1,6 @@
 // lib/auth/session.ts
 import { NextRequest } from "next/server";
-import { verifyToken } from "../auth";
+import { verifyAccessToken } from "../auth";   // Make sure to import from correct file
 
 export type SessionUser = {
   userId: string;
@@ -14,7 +14,7 @@ export async function getSession(request: NextRequest): Promise<SessionUser | nu
   if (!token) return null;
 
   try {
-    return await verifyToken(token);
+    return await verifyAccessToken(token);   // Changed to verifyAccessToken
   } catch {
     return null;
   }
@@ -24,7 +24,9 @@ export async function requireUser(request: NextRequest): Promise<SessionUser> {
   const user = await getSession(request);
 
   if (!user) {
-    throw new Error("UNAUTHORIZED");
+    const error: any = new Error("UNAUTHORIZED");
+    error.status = 401;
+    throw error;
   }
 
   return user;
@@ -37,7 +39,9 @@ export async function requireRole(
   const user = await requireUser(request);
 
   if (!allowedRoles.includes(user.role)) {
-    throw new Error("FORBIDDEN");
+    const error: any = new Error("FORBIDDEN");
+    error.status = 403;
+    throw error;
   }
 
   return user;

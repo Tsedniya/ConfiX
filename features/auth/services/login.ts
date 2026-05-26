@@ -1,36 +1,49 @@
-// features/auth/services/login.ts
 import bcrypt from "bcryptjs";
 import User from "@/models/User";
-import { generateAccessToken, generateRefreshToken } from "@/lib/auth";
 
-type LoginInput = {
+export const loginUser = async (data: {
   email: string;
   password: string;
-}; 
-
-export async function loginUser(data: LoginInput) {
+}) => {
   const { email, password } = data;
 
+  // 1. Validate input
   if (!email || !password) {
-    throw new Error("Missing required fields");
+    const error: any = new Error("Email and password are required");
+    error.status = 400;
+    throw error;
   }
 
-  const user = await User.findOne({ email });
+  // 2. Find user by email
+  const user = await User.findOne({ email }).select("+password"); // Important: include password
 
   if (!user) {
-    throw new Error("User not found");
+    const error: any = new Error("Invalid email or password");
+    error.status = 401;
+    throw error;
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
-
-  if (!isMatch) {
-    throw new Error("Invalid credentials");
+  // 3. Compare password
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    const error: any = new Error("Invalid email or password");
+    error.status = 401;
+    throw error;
   }
 
+  // 4. Check if user is approved (Critical for Speaker & Organizer)
+  if (!user.isApproved) {
+    const error: any = new Error("Your account is pending approval by an administrator");
+    error.status = 403;
+    throw error;
+  }
+
+  // 5. Return user data (without password)
   return {
-    id: user._id.toString(),
+    id: user._id,
     name: user.name,
     email: user.email,
     role: user.role,
+    isApproved: user.isApproved,
   };
-}
+};

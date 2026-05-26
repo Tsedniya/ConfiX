@@ -10,6 +10,14 @@ export async function POST(req: Request) {
 
     const user = await loginUser(body);
 
+    // Check if user is approved (important for Speaker & Organizer)
+    if (!user.isApproved) {
+      return NextResponse.json({
+        success: false,
+        message: "Your account is pending approval by admin"
+      }, { status: 403 });
+    }
+
     const payload = {
       userId: user.id,
       role: user.role,
@@ -22,29 +30,41 @@ export async function POST(req: Request) {
 
     const response = NextResponse.json({
       success: true,
-      user,
+      message: "Login successful",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      }
     });
 
+    // Set Access Token (short lived)
     response.cookies.set("token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 15 * 60,
+      maxAge: 15 * 60,           // 15 minutes
     });
 
+    // Set Refresh Token (long lived)
     response.cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: 7 * 24 * 60 * 60,   // 7 days
     });
 
     return response;
+
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, message: error.message },
+      { 
+        success: false, 
+        message: error.message || "Invalid credentials" 
+      },
       { status: 401 }
     );
   }
