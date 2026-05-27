@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
-const MONGO = process.env.MONGO;
+const MONGO = process.env.MONGODB_URI || process.env.MONGO;
 
 if (!MONGO) {
-  throw new Error("Please define the MONGO env variable inside .env");
+  throw new Error("Please define the MONGODB_URI or MONGO env variable inside .env");
 }
 
 interface MongooseCache {

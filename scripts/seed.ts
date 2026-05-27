@@ -6,42 +6,42 @@ const users = [
   {
     name: "Super Admin",
     email: "admin@conference.com",
-    password: "admin123",
+    password: "password123",
     role: "admin" as const,
     isApproved: true,
   },
   {
     name: "John Organizer",
     email: "organizer@conference.com",
-    password: "org123",
+    password: "password123",
     role: "organizer" as const,
     isApproved: true,
   },
   {
     name: "Dr. Sarah Chen",
     email: "sarah.speaker@conference.com",
-    password: "speaker123",
+    password: "password123",
     role: "speaker" as const,
     isApproved: true,
   },
   {
     name: "Michael Roberts",
     email: "michael.speaker@conference.com",
-    password: "speaker123",
+    password: "password123",
     role: "speaker" as const,
     isApproved: false,        // Example of pending approval
   },
   {
     name: "Alice Johnson",
     email: "alice.attendee@gmail.com",
-    password: "attendee123",
+    password: "password123",
     role: "attendee" as const,
     isApproved: true,
   },
   {
     name: "David Kim",
     email: "david.attendee@gmail.com",
-    password: "attendee123",
+    password: "password123",
     role: "attendee" as const,
     isApproved: true,
   },
@@ -57,6 +57,13 @@ const seedDatabase = async () => {
 
     await mongoose.connect(mongoUri);
     console.log("✅ Connected to MongoDB");
+
+    // Check for --reset flag
+    const shouldReset = process.argv.includes("--reset");
+    if (shouldReset) {
+      await User.deleteMany({});
+      console.log("🔄 Cleared existing users");
+    }
 
     for (const userData of users) {
       const existingUser = await User.findOne({ email: userData.email });
@@ -79,10 +86,10 @@ const seedDatabase = async () => {
     console.log("\n🎉 Seeding completed successfully!");
     console.log("\nLogin Credentials:");
     console.log("-------------------");
-    console.log("Admin      → admin@conference.com / admin123");
-    console.log("Organizer  → organizer@conference.com / org123");
-    console.log("Speaker    → sarah.speaker@conference.com / speaker123");
-    console.log("Attendee   → alice.attendee@gmail.com / attendee123");
+    console.log("Admin      → admin@conference.com / password123");
+    console.log("Organizer  → organizer@conference.com / password123");
+    console.log("Speaker    → sarah.speaker@conference.com / password123");
+    console.log("Attendee   → alice.attendee@gmail.com / password123");
 
   } catch (error) {
     console.error("❌ Seeding failed:", error);
