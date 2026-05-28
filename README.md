@@ -1,6 +1,6 @@
 
 
-## ✨ Features
+##  Features
 
 ### Core Functionality
 - **Multi-Role System**: Admin, Organizer, Speaker, Attendee
