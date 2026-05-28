@@ -2,64 +2,79 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 
-const PROTECTED_PREFIXES = ["/dashboard"];
-const AUTH_PAGES = ["/sign-in", "/sign-up"];
-const PUBLIC_ROUTES = ["/", ...AUTH_PAGES];
+const PUBLIC_ROUTES = ["/", "/sign-in", "/sign-up"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const user = await getSession(request);
-  const isAuthenticated = !!user;
+  const session = await getSession(request);
+  const isAuthenticated = !!session;
 
-  // Skip for API routes and static assets
-  if (pathname.startsWith("/api/") || 
-      pathname.startsWith("/_next/") || 
-      pathname.includes(".")) {
+  // Skip API routes, static files, assets
+  if (
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/_next/") ||
+    pathname.startsWith("/favicon.ico") ||
+    pathname.includes(".")
+  ) {
     return NextResponse.next();
   }
 
-  // 1. Authenticated user on auth pages → redirect to their dashboard
-  if (isAuthenticated && AUTH_PAGES.includes(pathname)) {
-    const redirectPath = getRoleDashboard(user!.role);
+  // Role routes
+  const roleRoutes = ["/attendee", "/organizer", "/speaker", "/admin"];
+
+  // 1. Authenticated users should not access auth pages
+  if (
+    isAuthenticated &&
+    (pathname === "/sign-in" || pathname === "/sign-up")
+  ) {
+    const redirectPath = getRoleDashboard(session!.role);
     return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 
-  // 2. Unauthenticated user trying to access protected routes
-  if (!isAuthenticated && PROTECTED_PREFIXES.some((route) => pathname.startsWith(route))) {
+  // 2. Unauthenticated users trying to access protected pages
+  const isProtectedRoute = roleRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  if (!isAuthenticated && isProtectedRoute) {
     const loginUrl = new URL("/sign-in", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
+
     return NextResponse.redirect(loginUrl);
   }
 
-  // 3. Redirect root /dashboard to correct role dashboard
-  if (isAuthenticated && pathname === "/dashboard") {
-    const redirectPath = getRoleDashboard(user!.role);
+  // 3. Redirect authenticated user from "/" to their dashboard
+  if (isAuthenticated && pathname === "/") {
+    const redirectPath = getRoleDashboard(session!.role);
     return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 
-  // 4. Prevent accessing wrong role's dashboard
-  if (isAuthenticated && pathname.startsWith("/dashboard/")) {
-    const requestedRole = pathname.split("/")[2];
-    const userRole = user!.role;
+  // 4. Prevent users from accessing another role's route
+  if (isAuthenticated && isProtectedRoute) {
+    const requestedRole = pathname.split("/")[1];
 
-    if (requestedRole && requestedRole !== userRole) {
-      const redirectPath = getRoleDashboard(userRole);
-      return NextResponse.redirect(new URL(redirectPath, request.url));
+    if (requestedRole !== session!.role) {
+      const correctDashboard = getRoleDashboard(session!.role);
+
+      return NextResponse.redirect(
+        new URL(correctDashboard, request.url)
+      );
     }
   }
 
   return NextResponse.next();
 }
 
-// Helper function
+// Helper
 function getRoleDashboard(role: string): string {
-  const map: Record<string, string> = {
-    admin: "/dashboard/admin",
-    organizer: "/dashboard/organizer",
-    speaker: "/dashboard/speaker",
-    attendee: "/dashboard/attendee",
+  const roleMap: Record<string, string> = {
+    attendee: "/attendee",
+    organizer: "/organizer",
+    speaker: "/speaker",
+    admin: "/admin",
   };
-  return map[role] || "/";
+
+  return roleMap[role] || "/attendee";
 }
 
 export const config = {

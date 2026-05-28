@@ -14,8 +14,12 @@ export const loginUser = async (data: {
     throw error;
   }
 
-  // 2. Find user by email
-  const user = await User.findOne({ email }).select("+password"); // Important: include password
+  const normalizedEmail = email.toLowerCase();
+
+  // 2. Find user
+  const user = await User.findOne({
+    email: normalizedEmail,
+  });
 
   if (!user) {
     const error: any = new Error("Invalid email or password");
@@ -24,26 +28,40 @@ export const loginUser = async (data: {
   }
 
   // 3. Compare password
-  const isPasswordValid = await bcrypt.compare(password, user.password);
+  const isPasswordValid = await bcrypt.compare(
+    password,
+    user.password
+  );
+
   if (!isPasswordValid) {
     const error: any = new Error("Invalid email or password");
     error.status = 401;
     throw error;
   }
 
-  // 4. Check if user is approved (Critical for Speaker & Organizer)
-  if (!user.isApproved) {
-    const error: any = new Error("Your account is pending approval by an administrator");
+  // 4. Status check (THIS replaces isApproved)
+  if (user.status === "pending") {
+    const error: any = new Error(
+      "Your account is pending approval"
+    );
     error.status = 403;
     throw error;
   }
 
-  // 5. Return user data (without password)
+  if (user.status === "suspended") {
+    const error: any = new Error(
+      "Your account has been suspended"
+    );
+    error.status = 403;
+    throw error;
+  }
+
+  // 5. Return safe user
   return {
     id: user._id,
     name: user.name,
     email: user.email,
     role: user.role,
-    isApproved: user.isApproved,
+    status: user.status,
   };
 };

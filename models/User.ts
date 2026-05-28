@@ -4,8 +4,11 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  role: "attendee" | "speaker" | "organizer" | "admin";   // ← Added "admin"
-  isApproved: boolean;        // Good to have for Speaker & Organizer
+
+  role: "attendee" | "speaker" | "organizer" | "admin";
+
+  status: "active" | "pending" | "rejected" | "suspended";
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -13,19 +16,33 @@ export interface IUser extends Document {
 const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+    },
+
     role: {
       type: String,
       enum: ["attendee", "speaker", "organizer", "admin"],
       default: "attendee",
     },
-    isApproved: {
-      type: Boolean,
-      default: true,   // Admin = true, Speaker/Organizer can be false initially
+
+    status: {
+      type: String,
+      enum: ["active", "pending", "rejected", "suspended"],
+      default: "active",
     },
   },
   { timestamps: true }
 );
 
-export default mongoose.models.User || mongoose.model<IUser>("User", userSchema);
+export default mongoose.models.User ||
+  mongoose.model<IUser>("User", userSchema);

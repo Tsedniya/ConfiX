@@ -10,8 +10,8 @@ export async function POST(req: Request) {
 
     const user = await loginUser(body);
 
-    // Check if user is approved (important for Speaker & Organizer)
-    if (!user.isApproved) {
+    // Check account status (replace legacy `isApproved` check)
+    if (user.status === "pending") {
       return NextResponse.json({
         success: false,
         message: "Your account is pending approval by admin"
