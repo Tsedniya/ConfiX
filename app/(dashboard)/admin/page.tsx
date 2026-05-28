@@ -76,45 +76,35 @@ export default function AdminDashboardPage() {
   });
 
   // ---------------- UPDATE STATUS ----------------
-  const updateStatusMutation = useMutation({
-    mutationFn: async ({
-      id,
-      status,
-    }: {
-      id: string;
-      status: "approved" | "rejected";
-    }) => {
+const updateStatusMutation = useMutation({
+  mutationFn: async ({ id, status }: { id: string; status: "approved" | "rejected" }) => {
+    console.log("Sending request for ID:", id);
+    const res = await fetch(`/api/admin/organizer-applications/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",        // ← Add this
+      body: JSON.stringify({ 
+        status,
+        // reason: "Optional rejection reason"   // You can add later
+      }),
+    });
 
-      const res = await fetch(
-        `/api/admin/organizer-applications/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status,
-          }),
-        }
-      );
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to update application");
+    }
 
-      if (!res.ok) {
-        throw new Error(
-          "Failed to update application"
-        );
-      }
+    return res.json();
+  },
 
-      return res.json();
-    },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["organizer-applications"] });
+  },
 
-    onSuccess: () => {
-
-      queryClient.invalidateQueries({
-        queryKey: ["organizer-applications"],
-      });
-
-    },
-  });
+  onError: (error: any) => {
+    alert(error.message || "Failed to update status");
+  },
+});
 
   return (
     <div className="z-0 flex min-h-screen w-full flex-1 flex-col bg-white p-2 md:p-3 lg:p-4 xl:p-6 dark:bg-slate-950/20">

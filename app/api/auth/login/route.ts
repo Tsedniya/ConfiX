@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
     const user = await loginUser(body);
 
-    // Check account status (replace legacy `isApproved` check)
+    // Check account status
     if (user.status === "pending") {
       return NextResponse.json({
         success: false,
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     };
 
     const accessToken = await generateAccessToken(payload);
-    const refreshToken = await generateRefreshToken(payload);
+    // const refreshToken = await generateRefreshToken(payload); // Uncomment if you need it
 
     const response = NextResponse.json({
       success: true,
@@ -39,33 +39,22 @@ export async function POST(req: Request) {
       }
     });
 
-    // Set Access Token (short lived)
+    // Set Access Token Cookie (Main token used in getSession)
     response.cookies.set("token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 15 * 60,           // 15 minutes
-    });
-
-    // Set Refresh Token (long lived)
-    response.cookies.set("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 7 * 24 * 60 * 60,   // 7 days
+      maxAge: 15 * 60,        // 15 minutes
     });
 
     return response;
 
   } catch (error: any) {
-    return NextResponse.json(
-      { 
-        success: false, 
-        message: error.message || "Invalid credentials" 
-      },
-      { status: 401 }
-    );
+    console.error("Login error:", error);
+    return NextResponse.json({
+      success: false,
+      message: error.message || "Invalid credentials"
+    }, { status: 401 });
   }
 }
