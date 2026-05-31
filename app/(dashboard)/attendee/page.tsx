@@ -1,5 +1,7 @@
 "use client";
-
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   AlertCircle,
@@ -82,8 +84,35 @@ const projects = [
 ];
 
 export default function AdminDashboardPage() {
+  const router = useRouter();
+
   return (
     <div className="z-0 flex min-h-screen w-full flex-1 flex-col bg-white p-2 md:p-3 lg:p-4 xl:p-6 dark:bg-slate-950/20">
+      {/* ----------------- ORGANIZER APPLICATION ALERT ----------------- */}
+      <Alert className="mb-6 border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30">
+        <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+
+        <AlertTitle className="text-blue-900 dark:text-blue-200">
+          Become an Organizer
+        </AlertTitle>
+
+        <AlertDescription className="mt-2 flex flex-col gap-4 text-blue-800 dark:text-blue-300 md:flex-row md:items-center md:justify-between">
+          <div className="max-w-2xl text-sm leading-relaxed">
+            Want to host and manage conferences on ConfiX? Submit an organizer
+            application to create events, manage sessions, approve speakers,
+            and coordinate attendees.
+          </div>
+
+          <Button
+              onClick={() =>
+                router.push("/apply-organizer")
+              }
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Apply Now
+            </Button>
+        </AlertDescription>
+      </Alert>
       {/* ----------------- TOP HEADER ----------------- */}
       <header className="mb-3 flex w-full flex-col items-start justify-between gap-2 md:flex-row md:items-center">
         <div className="flex flex-col gap-0.5">

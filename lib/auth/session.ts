@@ -1,6 +1,6 @@
 // lib/auth/session.ts
 import { NextRequest } from "next/server";
-import { verifyAccessToken } from "../auth";   // Make sure to import from correct file
+import { verifyAccessToken } from "../auth";
 
 export type SessionUser = {
   userId: string;
@@ -10,25 +10,36 @@ export type SessionUser = {
 };
 
 export async function getSession(request: NextRequest): Promise<SessionUser | null> {
+  // Debug: Check all cookies
+  console.log("All cookies:", request.cookies.getAll().map(c => c.name));
+
   const token = request.cookies.get("token")?.value;
-  if (!token) return null;
+
+  console.log("Token from cookie:", token ? "✅ Found" : "❌ Not found");
+
+  if (!token) {
+    console.log("No token cookie found → Unauthorized");
+    return null;
+  }
 
   try {
-    return await verifyAccessToken(token);   // Changed to verifyAccessToken
-  } catch {
+    const user = await verifyAccessToken(token);
+    console.log("Session decoded successfully:", { userId: user.userId, role: user.role });
+    return user;
+  } catch (error: any) {
+    console.error("Token verification failed:", error.message);
     return null;
   }
 }
 
+// Keep your other functions
 export async function requireUser(request: NextRequest): Promise<SessionUser> {
   const user = await getSession(request);
-
   if (!user) {
     const error: any = new Error("UNAUTHORIZED");
     error.status = 401;
     throw error;
   }
-
   return user;
 }
 
@@ -37,12 +48,10 @@ export async function requireRole(
   allowedRoles: string[]
 ): Promise<SessionUser> {
   const user = await requireUser(request);
-
   if (!allowedRoles.includes(user.role)) {
     const error: any = new Error("FORBIDDEN");
     error.status = 403;
     throw error;
   }
-
   return user;
 }
