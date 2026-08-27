@@ -17,7 +17,7 @@ export function NavSecondary({
   items: {
     title: string
     url: string
-    icon: React.ReactNode
+    icon: React.ReactNode | React.ComponentType<any>
   }[]
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   return (
@@ -28,7 +28,11 @@ export function NavSecondary({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild>
                 <a href={item.url}>
-                  {item.icon}
+                  {React.isValidElement(item.icon)
+                    ? item.icon
+                    : typeof item.icon === "function"
+                    ? React.createElement(item.icon as React.ComponentType<any>)
+                    : item.icon}
                   <span>{item.title}</span>
                 </a>
               </SidebarMenuButton>

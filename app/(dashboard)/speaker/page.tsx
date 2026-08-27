@@ -2,49 +2,34 @@
 
 import { motion } from "framer-motion";
 import {
-  AlertCircle,
   Bell,
   Briefcase,
-  Check,
   CheckCircle2,
   ChevronRight,
-  Coins,
-  FileCheck2,
-  FileSearch,
-  Files,
   FileText,
   LayoutDashboard,
   Search,
-  ShieldAlert,
-  UserCog,
-  UserPlus,
-  Users,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 // Mock User Context (for Role-Based UI demo)
 const currentUser = {
-  name: "Dr. Admin",
-  role: "Finance", // e.g. VPRTT, RAD, Finance
+  name: "Dr. John Doe",
+  role: "Speaker",
 };
+
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1, // Cards will pop in one after another
+      staggerChildren: 0.1,
     },
   },
 };
@@ -54,34 +39,77 @@ const cardVariants = {
   show: { y: 0, opacity: 1 },
 };
 
-const projects = [
+// Speaker-specific stats
+const speakerStats = [
   {
-    name: "AI Health Diagnostics",
-    status: "Active",
-    progress: 75,
-    team: 6,
-    badgeColor:
-      "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-medium border-blue-200/50 dark:border-blue-800/50",
+    title: "Proposals",
+    value: 5,
+    icon: FileText,
+    color: "blue",
+    change: "+2",
   },
   {
-    name: "Quantum Computing Simulation",
-    status: "In Review",
-    progress: 40,
-    team: 4,
-    badgeColor:
-      "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 font-medium border-amber-200/50 dark:border-amber-800/50",
+    title: "Accepted",
+    value: 2,
+    icon: CheckCircle2,
+    color: "emerald",
+    change: "40%",
   },
   {
-    name: "Neural Interface Robotics",
-    status: "Delayed",
-    progress: 20,
-    team: 5,
-    badgeColor:
-      "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 font-medium border-red-200/50 dark:border-red-800/50",
+    title: "Sessions",
+    value: 3,
+    icon: Briefcase,
+    color: "purple",
+    change: "Upcoming",
+  },
+  {
+    title: "Notifications",
+    value: 4,
+    icon: Bell,
+    color: "amber",
+    change: "New",
   },
 ];
 
-export default function AdminDashboardPage() {
+// Speaker proposals data
+const proposals = [
+  {
+    title: "AI in Healthcare",
+    conference: "EthioConf 2026",
+    status: "Accepted",
+  },
+  {
+    title: "NLP for African Languages",
+    conference: "Addis AI Summit",
+    status: "Pending",
+  },
+  {
+    title: "LLMs in Education",
+    conference: "Education Tech Expo",
+    status: "Rejected",
+  },
+];
+
+// Speaker notifications
+const notifications = [
+  {
+    title: "Proposal Accepted",
+    message: "Your proposal 'AI in Healthcare' has been accepted.",
+    time: "5m ago",
+  },
+  {
+    title: "Session Updated",
+    message: "Your talk schedule has been changed.",
+    time: "1h ago",
+  },
+  {
+    title: "Slides Requested",
+    message: "Organizer requested presentation materials.",
+    time: "Yesterday",
+  },
+];
+
+export default function SpeakerDashboardPage() {
   return (
     <div className="z-0 flex min-h-screen w-full flex-1 flex-col bg-white p-2 md:p-3 lg:p-4 xl:p-6 dark:bg-slate-950/20">
       {/* ----------------- TOP HEADER ----------------- */}
@@ -89,286 +117,212 @@ export default function AdminDashboardPage() {
         <div className="flex flex-col gap-0.5">
           <h1 className="flex items-center gap-2 font-extrabold text-lg text-slate-900 tracking-tight dark:text-slate-100">
             <LayoutDashboard className="h-4 w-4 text-blue-600 dark:text-blue-500" />
-            Research Control Center
+            Speaker Dashboard
           </h1>
 
           <p className="font-medium text-sm text-slate-500 leading-tight dark:text-slate-400">
-            Welcome back, {currentUser.name}. Here's an overview of the university research ecosystem today.
+            Welcome back, {currentUser.name}. Manage your talks, proposals and conference sessions.
           </p>
         </div>
       </header>
 
       {/* ----------------- STAT SUMMARY CARDS ----------------- */}
       <div className="mb-8 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:gap-6">
-        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="w-full group">
-          <Card className="h-full border-slate-200/60 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800/60 dark:bg-slate-950">
-            <CardContent className="p-2">
-              <div className="flex items-center justify-between gap-1">
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className="
-                      flex h-7 w-7 items-center justify-center rounded-md
-                      bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400
-                      transition-all duration-300
-                      group-hover:bg-blue-600 group-hover:text-white
-                      group-hover:shadow-[0_0_12px_rgba(59,130,246,0.45)]
-                      group-hover:scale-105
-                    "
-                  >
-                    <Briefcase className="h-3 w-3" />
+        {speakerStats.map((stat, index) => (
+          <motion.div
+            key={stat.title}
+            variants={cardVariants}
+            whileHover={{ y: -5 }}
+            className="w-full group"
+          >
+            <Card className="h-full border-slate-200/60 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800/60 dark:bg-slate-950">
+              <CardContent className="p-2">
+                <div className="flex items-center justify-between gap-1">
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className={`
+                        flex h-7 w-7 items-center justify-center rounded-md
+                        bg-${stat.color}-50 text-${stat.color}-600 
+                        dark:bg-${stat.color}-900/20 dark:text-${stat.color}-400
+                        transition-all duration-300
+                        group-hover:bg-${stat.color}-600 group-hover:text-white
+                        group-hover:shadow-[0_0_12px_rgba(59,130,246,0.45)]
+                        group-hover:scale-105
+                      `}
+                    >
+                      <stat.icon className="h-3 w-3" />
+                    </div>
+
+                    <div className="leading-none">
+                      <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                        {stat.title}
+                      </p>
+                      <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        {stat.value}
+                      </h2>
+                    </div>
                   </div>
 
-                  <div className="leading-none">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">Projects</p>
-                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">142</h2>
-                  </div>
+                  <span className="text-[12px] text-emerald-600 dark:text-emerald-400">
+                    {stat.change}
+                  </span>
                 </div>
-
-                <span className="text-[12px] text-emerald-600 dark:text-emerald-400">+12%</span>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="w-full group">
-          <Card className="h-full border-slate-200/60 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800/60 dark:bg-slate-950">
-            <CardContent className="p-2">
-              <div className="flex items-center justify-between gap-1">
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className="
-                    flex h-7 w-7 items-center justify-center rounded-md
-                    bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400
-                    transition-all duration-300
-                    group-hover:bg-amber-600 group-hover:text-white
-                group-hover:shadow-[0_0_12px_rgba(245,158,11,0.45)]
-                group-hover:scale-105
-              "
-                  >
-                    <FileCheck2 className="h-3 w-3" />
-                  </div>
-
-                  <div className="leading-none">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">Pending</p>
-                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">28</h2>
-                  </div>
-                </div>
-
-                <span className="text-[12px] font-bold text-red-600 dark:text-red-400">Alert</span>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="w-full group">
-          <Card className="relative h-full border-slate-200/60 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800/60 dark:bg-slate-950">
-            <CardContent className="p-2">
-              <div className="flex items-center justify-between gap-1">
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className="
-                flex h-7 w-7 items-center justify-center rounded-md
-                bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400
-                transition-all duration-300
-                group-hover:bg-indigo-600 group-hover:text-white
-                group-hover:shadow-[0_0_12px_rgba(99,102,241,0.45)]
-                group-hover:scale-105
-              "
-                  >
-                    <Coins className="h-3 w-3" />
-                  </div>
-
-                  <div className="leading-none">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">Budget</p>
-                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">2.4M</h2>
-                  </div>
-                </div>
-
-                <span className="text-[12px] text-blue-600 dark:text-blue-400">Birr</span>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="w-full group">
-          <Card className="h-full border-slate-200/60 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800/60 dark:bg-slate-950">
-            <CardContent className="p-2">
-              <div className="flex items-center justify-between gap-1">
-                {/* LEFT SIDE */}
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className="
-                  flex h-7 w-7 items-center justify-center rounded-md
-                  bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400
-                  transition-all duration-300
-                  group-hover:bg-emerald-600 group-hover:text-white
-                  group-hover:shadow-[0_0_12px_rgba(16,185,129,0.45)]
-                  group-hover:scale-105
-                "
-                  >
-                    <CheckCircle2 className="h-3 w-3" />
-                  </div>
-
-                  <div className="leading-none">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">Done</p>
-                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">56</h2>
-                  </div>
-                </div>
-
-                {/* RIGHT SIDE */}
-                <span className="text-[12px] text-amber-600 dark:text-amber-400">All</span>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
       </div>
 
       {/* ----------------- MAIN CONTROL AREA ----------------- */}
       <div className="grid w-full grid-cols-1 gap-6 xl:grid-cols-3 xl:gap-8">
         {/* ================= LEFT: NOTIFICATION CENTER ================= */}
-
         <div className="flex flex-col gap-3 xl:col-span-1">
-          <Card className="border-red-200/40 bg-white shadow-sm dark:border-red-900/30 dark:bg-slate-950/50">
-            {/* HEADER (compact) */}
-            <CardHeader className="border-b border-red-100 px-3 py-2 dark:border-red-900/20">
+          <Card className="border-amber-200/40 bg-white shadow-sm dark:border-amber-900/30 dark:bg-slate-950/50">
+            <CardHeader className="border-b border-amber-100 px-3 py-2 dark:border-amber-900/20">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
-                  <Bell className="h-4 w-4 text-red-500" />
+                  <Bell className="h-4 w-4 text-amber-500" />
                   Notifications
                 </CardTitle>
 
-                <Badge className="bg-red-100 px-2 py-0 text-[10px] text-red-700 dark:bg-red-900/40 dark:text-red-300">
-                  2
+                <Badge className="bg-amber-100 px-2 py-0 text-[10px] text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                  3
                 </Badge>
               </div>
 
               <CardDescription className="text-[10px] text-slate-500 leading-tight">
-                Transfer requests & team changes requiring action
+                Recent updates and requests
               </CardDescription>
             </CardHeader>
 
-            {/* CONTENT */}
             <CardContent className="flex flex-col gap-2 p-2">
-              {/* Notification Item */}
-              <div className="flex items-start gap-2 rounded-md border border-slate-100 bg-white p-2 dark:border-slate-800 dark:bg-slate-900">
-                {/* Avatar */}
-                <Avatar className="h-7 w-7">
-                  <AvatarFallback className="bg-red-100 text-[10px] text-red-700">DR</AvatarFallback>
-                </Avatar>
+              {notifications.map((notification, index) => (
+                <div
+                  key={index}
+                  className="flex items-start gap-2 rounded-md border border-slate-100 bg-white p-2 dark:border-slate-800 dark:bg-slate-900"
+                >
+                  <Avatar className="h-7 w-7">
+                    <AvatarFallback className="bg-amber-100 text-[10px] text-amber-700">
+                      {notification.title.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
 
-                {/* Content */}
-                <div className="flex flex-1 flex-col leading-tight">
-                  <div className="flex justify-between">
-                    <p className="text-[11px] font-semibold text-slate-800 dark:text-slate-200">Dr. Research Office</p>
-                    <span className="text-[9px] text-slate-400">2m</span>
-                  </div>
+                  <div className="flex flex-1 flex-col leading-tight">
+                    <div className="flex justify-between">
+                      <p className="text-[11px] font-semibold text-slate-800 dark:text-slate-200">
+                        {notification.title}
+                      </p>
+                      <span className="text-[9px] text-slate-400">{notification.time}</span>
+                    </div>
 
-                  <p className="text-[10px] text-slate-500">Project Transfer Request (PRJ-102)</p>
-
-                  <div className="mt-1.5 flex gap-2">
-                    <Button size="sm" className="h-5 px-2 text-[10px] bg-emerald-600">
-                      Approve
-                    </Button>
-                    <Button size="sm" variant="destructive" className="h-5 px-2 text-[10px]">
-                      Reject
-                    </Button>
+                    <p className="text-[10px] text-slate-500">{notification.message}</p>
                   </div>
                 </div>
-              </div>
-
-              {/* Notification Item */}
-              <div className="flex items-start gap-2 rounded-md border border-slate-100 bg-white p-2 dark:border-slate-800 dark:bg-slate-900">
-                {/* Avatar */}
-                <Avatar className="h-7 w-7">
-                  <AvatarFallback className="bg-blue-100 text-[10px] text-blue-700">CP</AvatarFallback>
-                </Avatar>
-
-                {/* Content */}
-                <div className="flex flex-1 flex-col leading-tight">
-                  <div className="flex justify-between">
-                    <p className="text-[11px] font-semibold text-slate-800 dark:text-slate-200">Co-PI Office</p>
-                    <span className="text-[9px] text-slate-400">10m</span>
-                  </div>
-
-                  <p className="text-[10px] text-slate-500">Team Replacement Request (PRJ-204)</p>
-
-                  <div className="mt-1.5 flex gap-2">
-                    <Button size="sm" className="h-5 px-2 text-[10px] bg-blue-600">
-                      Review
-                    </Button>
-                    <Button size="sm" variant="outline" className="h-5 px-2 text-[10px]">
-                      Dismiss
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              ))}
             </CardContent>
           </Card>
         </div>
-        {/* ================= RIGHT: DATA TABLE ================= */}
+
+        {/* ================= RIGHT: PROPOSALS TABLE ================= */}
         <div className="xl:col-span-2 flex flex-col gap-4">
           <Card className="border-slate-200/60 bg-white shadow-sm dark:border-slate-800/60 dark:bg-slate-950">
-            {/* Header + Search */}
             <CardHeader className="border-b pb-3 dark:border-slate-800">
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
                   <CardTitle className="font-bold text-md text-slate-900 dark:text-slate-100">
-                    Project Registry
+                    My Proposals
                   </CardTitle>
                   <CardDescription className="text-xs text-slate-500">
-                    Search and manage all active research projects
+                    Track and manage your conference proposals
                   </CardDescription>
                 </div>
 
                 <div className="relative w-full md:w-64">
                   <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <Input placeholder="Search projects..." className="h-9 pl-8 rounded-full" />
+                  <Input
+                    placeholder="Search proposals..."
+                    className="h-9 pl-8 rounded-full"
+                  />
                 </div>
               </div>
             </CardHeader>
 
-            {/* Table */}
             <CardContent className="p-0">
               <Table>
                 <TableHeader className="bg-slate-50 dark:bg-slate-900">
                   <TableRow>
-                    <TableHead className="text-xs">Project</TableHead>
-                    <TableHead className="text-xs">PI</TableHead>
+                    <TableHead className="text-xs">Proposal</TableHead>
+                    <TableHead className="text-xs">Conference</TableHead>
                     <TableHead className="text-xs">Status</TableHead>
-                    <TableHead className="text-right text-xs">Quick Action</TableHead>
+                    <TableHead className="text-right text-xs">Action</TableHead>
                   </TableRow>
                 </TableHeader>
 
                 <TableBody>
-                  {projects.map((p) => (
-                    <TableRow key={p.name} className="hover:bg-slate-50 dark:hover:bg-slate-900">
-                      {/* Project Name */}
-                      <TableCell className="font-medium text-sm">{p.name}</TableCell>
-
-                      {/* PI (you don’t have this field yet) */}
-                      <TableCell className="text-sm text-slate-500">—</TableCell>
-
-                      {/* Status with badge (better UI than plain text) */}
-                      <TableCell>
-                        <Badge className={`${p.badgeColor} text-[10px] px-2 py-0`}>{p.status}</Badge>
+                  {proposals.map((proposal) => (
+                    <TableRow
+                      key={proposal.title}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-900"
+                    >
+                      <TableCell className="font-medium text-sm">
+                        {proposal.title}
                       </TableCell>
 
-                      {/* Actions */}
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-7 text-xs">
-                              Actions
-                            </Button>
-                          </DropdownMenuTrigger>
+                      <TableCell className="text-sm text-slate-500">
+                        {proposal.conference}
+                      </TableCell>
 
-                          <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem className="text-emerald-600">Approve</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">Terminate</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                      <TableCell>
+                        <Badge
+                          className={`text-[10px] px-2 py-0 ${
+                            proposal.status === "Accepted"
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                              : proposal.status === "Pending"
+                              ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                              : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                          }`}
+                        >
+                          {proposal.status}
+                        </Badge>
+                      </TableCell>
+
+                      <TableCell className="text-right">
+                        <Button size="sm" variant="outline" className="h-7 text-xs">
+                          View
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+            </CardContent>
+          </Card>
+
+          {/* ================= UPCOMING SESSIONS ================= */}
+          <Card className="border-slate-200/60 bg-white shadow-sm dark:border-slate-800/60 dark:bg-slate-950">
+            <CardHeader className="border-b pb-3 dark:border-slate-800">
+              <CardTitle className="font-bold text-md text-slate-900 dark:text-slate-100">
+                Upcoming Sessions
+              </CardTitle>
+              <CardDescription className="text-xs text-slate-500">
+                Your scheduled talks and presentations
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-4 p-4">
+              <div className="rounded-lg border p-4">
+                <h3 className="font-semibold">AI in Healthcare</h3>
+                <p className="text-sm text-muted-foreground">EthioConf 2026</p>
+                <p className="text-sm">Aug 15 • 10:00 AM</p>
+                <p className="text-sm">Room A</p>
+              </div>
+
+              <div className="rounded-lg border p-4">
+                <h3 className="font-semibold">NLP for African Languages</h3>
+                <p className="text-sm text-muted-foreground">Addis AI Summit</p>
+                <p className="text-sm">Sep 10 • 2:00 PM</p>
+                <p className="text-sm">Hall B</p>
+              </div>
             </CardContent>
           </Card>
         </div>
