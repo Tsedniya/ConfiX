@@ -1,4 +1,5 @@
 "use client"
+import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,7 +17,7 @@ export function NavMain({
   items: {
     title: string
     url: string
-    icon?: React.ReactNode
+    icon?: React.ReactNode | React.ComponentType<any>
   }[]
 }) {
   return (
@@ -47,7 +48,11 @@ export function NavMain({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title}>
-                {item.icon}
+                {React.isValidElement(item.icon)
+                  ? item.icon
+                  : typeof item.icon === "function"
+                  ? React.createElement(item.icon as React.ComponentType<any>)
+                  : item.icon}
                 <span>{item.title}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
